@@ -2,7 +2,8 @@
 // photo loaded; ?shot=cover and ?shot=story show the exported cover alone,
 // full-bleed, at the size the query asks for. `photo` picks the sample
 // (samples/<photo>.jpg), `caption` the title words, `layout` the panel layout
-// (grid | hero | tilted), `grade` the colour grade, `size` the export size
+// (grid | hero | tilted | strip | poster), `grade` the colour grade,
+// `tstyle` the title style (block | outline | glow), `size` the export size
 // (square | portrait | wide). window.__shotReady is set once painted.
 export async function runShot(shot, query, state, api) {
   state.layout = query.get('layout') ?? 'grid';
@@ -11,18 +12,26 @@ export async function runShot(shot, query, state, api) {
   state.subtitle = query.get('subtitle') ?? 'one last ride down Ocean Drive';
   state.badge = query.get('badge') ?? 'VICE CITY • 2026';
   state.stars = Number(query.get('stars') ?? 4);
+  state.titleStyle = query.get('tstyle') ?? 'block';
+  state.frame = query.get('frame') === '1';
+  state.grain = Number(query.get('grain') ?? 40);
   const size = query.get('size') ?? (shot === 'story' ? 'portrait' : 'square');
 
-  // Keep the layout/grade buttons in sync with the scene.
+  // Keep the layout/grade/title buttons in sync with the scene.
   document.querySelectorAll('#layoutSeg .seg-btn').forEach((b) =>
     b.classList.toggle('active', b.dataset.layout === state.layout));
   document.querySelectorAll('#gradeRow .grade').forEach((b) =>
     b.classList.toggle('active', b.dataset.grade === state.grade));
+  document.querySelectorAll('#titleStyleSeg .seg-btn').forEach((b) =>
+    b.classList.toggle('active', b.dataset.tstyle === state.titleStyle));
   document.querySelectorAll('.pv').forEach((b) =>
     b.classList.toggle('active', b.dataset.preview === size));
   document.getElementById('title').value = state.title;
   document.getElementById('subtitle').value = state.subtitle;
   document.getElementById('badge').value = state.badge;
+  document.getElementById('frameToggle').checked = state.frame;
+  document.getElementById('grain').value = state.grain;
+  document.getElementById('grainVal').textContent = `${state.grain}%`;
 
   const photoName = query.get('photo') ?? 'pier';
   try {
@@ -32,8 +41,8 @@ export async function runShot(shot, query, state, api) {
   } catch { /* sample missing: render the empty-panel poster */ }
 
   // A little per-panel framing so the shots show the crop controls' effect.
-  state.crops[0] = { zoom: 1.45, ox: -0.06, oy: 0.04 };
-  state.crops[2] = { zoom: 1.2, ox: 0.08, oy: -0.05 };
+  state.crops[0] = { zoom: 1.45, ox: -0.06, oy: 0.04, fit: 'cover' };
+  state.crops[2] = { zoom: 1.2, ox: 0.08, oy: -0.05, fit: 'cover' };
 
   api.buildPanelMap(); api.syncCropSliders(); api.refreshTray();
   if (shot === 'cover' || shot === 'story') {

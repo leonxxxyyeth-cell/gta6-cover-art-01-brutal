@@ -1,18 +1,21 @@
 // A tiny static server for app/ (Node 22, standard library only), so the entry
 // can be tried locally without a build step: `node serve.ts` serves app/ on
-// http://localhost:8080. It sends the MIME types an offline web app needs,
-// refuses any path outside app/, and otherwise does nothing clever: this is a
-// development convenience, not a web server for the internet.
+// http://localhost:8080 (or --port <n>). It sends the MIME types an offline web
+// app needs, refuses any path outside app/, and otherwise does nothing clever:
+// this is a development convenience, not a web server for the internet.
 import { createReadStream, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('./app', import.meta.url)));
-const args = process.argv.slice(2);
-const portIndex = args.indexOf('--port');
-const requested = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
-const port = Number.isInteger(requested) && requested > 0 && requested < 65536 ? requested : 8080;
+
+function pickPort() {
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--port');
+  const n = at === -1 ? 8080 : Number(args[at + 1]);
+  return Number.isInteger(n) && n > 0 && n < 65536 ? n : 8080;
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -33,6 +36,13 @@ const MIME = {
   '.otf': 'font/otf',
 };
 
+/** Resolve a request path to a file inside app/, or null when it escapes. */
+function resolveInside(pathname) {
+  const file = resolve(join(root, normalize(pathname)));
+  if (file !== root && !file.startsWith(root + sep)) return null;
+  return file;
+}
+
 createServer((request, response) => {
   const url = new URL(request.url ?? '/', 'http://localhost');
   let pathname;
@@ -43,8 +53,8 @@ createServer((request, response) => {
     return;
   }
   if (pathname.endsWith('/')) pathname += 'index.html';
-  const file = resolve(join(root, normalize(pathname)));
-  if (file !== root && !file.startsWith(root + sep)) {
+  const file = resolveInside(pathname);
+  if (!file) {
     response.writeHead(403).end('forbidden');
     return;
   }
@@ -63,6 +73,6 @@ createServer((request, response) => {
     'cache-control': 'no-store',
   });
   createReadStream(file).pipe(response);
-}).listen(port, '127.0.0.1', () => {
-  console.log(`app/ is on http://localhost:${port}`);
+}).listen(pickPort(), '127.0.0.1', () => {
+  console.log(`app/ is on http://localhost:${pickPort()}`);
 });

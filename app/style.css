@@ -1,4 +1,4 @@
-/* Neon Coast — Vice City Cover Studio. Dark neon editor chrome, sunset accents. */
+/* Neon Coast v2 — Vice City Cover Studio. Dark neon editor chrome, sunset accents. */
 * { box-sizing: border-box; }
 :root {
   --bg: #0d0a14; --panel: #171226; --panel2: #1f1832; --line: #33284f;
@@ -27,7 +27,8 @@ body {
 .brand-name { font-weight: 900; letter-spacing: 3px; font-size: 20px; font-style: italic; }
 .brand-sub { color: var(--muted); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
 .offline-pill { color: #7dffb0; font-size: 12px; letter-spacing: 1px; margin-right: 10px; }
-.studio { display: grid; grid-template-columns: 380px 1fr; gap: 16px; padding: 16px 20px; align-items: start; }
+.top-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.studio { display: grid; grid-template-columns: 400px 1fr; gap: 16px; padding: 16px 20px; align-items: start; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
 .controls h2 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin: 18px 0 8px; }
 .controls h2:first-child { margin-top: 0; }
@@ -39,6 +40,7 @@ body {
   border-radius: 9px; padding: 8px 12px; font-size: 13px; cursor: pointer;
 }
 .btn:hover { border-color: var(--pink); }
+.btn:disabled { opacity: .45; cursor: default; }
 .btn-hot { background: linear-gradient(90deg, var(--orange), var(--pink)); border: none; font-weight: 800; color: #fff; }
 .file-btn {
   background: linear-gradient(90deg, var(--orange), var(--pink)); color: #fff; font-weight: 700;
@@ -48,6 +50,13 @@ body {
 .tray img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 2px solid transparent; cursor: pointer; }
 .tray img.selected { border-color: var(--gold); }
 .tray .empty { color: var(--muted); font-size: 12px; }
+.presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.preset {
+  background: var(--panel2); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 20px; padding: 7px 12px; font-size: 12.5px; cursor: pointer;
+}
+.preset:hover { border-color: var(--gold); }
+.preset.active { background: linear-gradient(90deg, rgba(255,122,24,.35), rgba(255,46,136,.35)); border-color: var(--pink); font-weight: 700; }
 .seg { display: flex; gap: 6px; flex-wrap: wrap; }
 .seg-btn {
   flex: 1; background: var(--panel2); color: var(--ink); border: 1px solid var(--line);
@@ -69,6 +78,8 @@ body {
 .slider-row { display: grid; grid-template-columns: 96px 1fr 52px; gap: 10px; align-items: center; font-size: 13px; color: var(--muted); margin: 8px 0; }
 .slider-row input[type="range"] { width: 100%; accent-color: var(--pink); }
 .slider-row span { text-align: right; color: var(--ink); }
+.check-row { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); margin: 8px 0; cursor: pointer; }
+.check-row input { accent-color: var(--pink); width: 16px; height: 16px; }
 .panel-map { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .panel-map button {
   aspect-ratio: 1.4; border-radius: 8px; border: 2px solid var(--line); cursor: pointer;
@@ -87,7 +98,7 @@ body {
 .pv { background: var(--panel2); color: var(--muted); border: 1px solid var(--line); border-radius: 7px; padding: 5px 9px; cursor: pointer; font-size: 12px; }
 .pv.active { color: #fff; border-color: var(--pink); font-weight: 700; }
 .canvas-holder { display: flex; justify-content: center; background: #0a0714; border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
-#cover { max-width: 100%; max-height: 72vh; width: auto; height: auto; border-radius: 6px; box-shadow: 0 12px 40px rgba(0,0,0,.6); }
+#cover { max-width: 100%; max-height: 72vh; width: auto; height: auto; border-radius: 6px; box-shadow: 0 12px 40px rgba(0,0,0,.6); cursor: crosshair; }
 .foot { text-align: center; color: var(--muted); font-size: 12px; padding: 10px 16px 22px; }
 /* Screenshot scenes: cover-only views hide the editor chrome. */
 body.shot-cover .topbar, body.shot-cover .controls, body.shot-cover .foot,

@@ -3,48 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Neon Coast — Vice City Cover Studio</title>
+<title>Neon Coast v2 — Vice City Cover Studio</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><span class="brand-mark">NC</span><span class="brand-name">NEON COAST</span><span class="brand-sub">Vice City Cover Studio</span></div>
+  <div class="brand"><span class="brand-mark">NC</span><span class="brand-name">NEON COAST</span><span class="brand-sub">Vice City Cover Studio · v2</span></div>
   <div class="top-actions">
     <span class="offline-pill" title="Runs fully offline — photos never leave this machine">● OFFLINE</span>
+    <button id="undoBtn" type="button" class="btn" disabled>↩ Undo</button>
+    <button id="redoBtn" type="button" class="btn" disabled>↪ Redo</button>
     <button id="exportAll" type="button" class="btn btn-hot">Export all 3 sizes</button>
   </div>
 </header>
 <main class="studio">
   <section class="panel controls" aria-label="Cover controls">
     <h2>1 · Photos</h2>
-    <p class="hint">Add one photo or several. Click a panel in the mini-map, then pick a photo for it — or fill every panel at once.</p>
+    <p class="hint">Add one photo or several. Click a panel in the mini-map (or right on the preview), then tap a photo to place it there — or fill every panel at once.</p>
     <div class="row">
       <label class="file-btn">+ Add photos
         <input id="photos" type="file" accept="image/*" multiple hidden>
       </label>
       <button id="fillAll" type="button" class="btn">Fill all panels</button>
       <button id="shuffle" type="button" class="btn">Shuffle panels</button>
+      <button id="surprise" type="button" class="btn" title="Random layout + grade">🎲 Surprise me</button>
     </div>
     <div id="photoTray" class="tray" aria-label="Loaded photos"></div>
 
-    <h2>2 · Layout</h2>
+    <h2>2 · One-click presets</h2>
+    <div class="presets" id="presetRow">
+      <button type="button" class="preset" data-preset="getaway">🌇 Golden Getaway</button>
+      <button type="button" class="preset" data-preset="nightdrive">🌃 Neon Night Drive</button>
+      <button type="button" class="preset" data-preset="goldrush">🥇 Vice Gold Rush</button>
+      <button type="button" class="preset" data-preset="midnight">🌙 Midnight Run</button>
+      <button type="button" class="preset" data-preset="candy">🍬 Candy Cruise</button>
+    </div>
+
+    <h2>3 · Layout</h2>
     <div class="seg" id="layoutSeg" role="group" aria-label="Layout">
       <button type="button" data-layout="grid" class="seg-btn active">Nine-Panel Grid</button>
       <button type="button" data-layout="hero" class="seg-btn">Hero + Three</button>
       <button type="button" data-layout="tilted" class="seg-btn">Tilted Snapshots</button>
+      <button type="button" data-layout="strip" class="seg-btn">Film Strip</button>
+      <button type="button" data-layout="poster" class="seg-btn">Full-Bleed Poster</button>
     </div>
 
-    <h2>3 · Grade</h2>
+    <h2>4 · Grade</h2>
     <div class="grades" id="gradeRow" role="group" aria-label="Colour grade">
       <button type="button" class="grade active" data-grade="sunset" style="--g1:#ff7a18;--g2:#ff2e88">Sunset</button>
       <button type="button" class="grade" data-grade="neon" style="--g1:#00e5ff;--g2:#ff2ec4">Neon Night</button>
       <button type="button" class="grade" data-grade="gold" style="--g1:#ffd319;--g2:#ff2975">Vice Gold</button>
       <button type="button" class="grade" data-grade="palm" style="--g1:#2affd5;--g2:#0b6e5d">Palm Teal</button>
       <button type="button" class="grade" data-grade="heat" style="--g1:#ff3b30;--g2:#ffb300">Heatwave</button>
+      <button type="button" class="grade" data-grade="midnight" style="--g1:#7b2ff7;--g2:#0b1035">Midnight</button>
+      <button type="button" class="grade" data-grade="candy" style="--g1:#ff6ec7;--g2:#4de3ff">Candy Pop</button>
     </div>
     <label class="slider-row">Grade strength <input id="gradeStrength" type="range" min="0" max="100" value="65"><span id="gradeStrengthVal">65%</span></label>
 
-    <h2>4 · Lettering</h2>
+    <h2>5 · Lettering</h2>
     <label class="field">Title
       <input id="title" type="text" maxlength="28" value="SUNSET HEIST">
     </label>
@@ -54,19 +71,27 @@
     <label class="field">Badge ribbon
       <input id="badge" type="text" maxlength="24" value="VICE CITY • 2026">
     </label>
+    <div class="seg" id="titleStyleSeg" role="group" aria-label="Title style">
+      <button type="button" data-tstyle="block" class="seg-btn active">Block title</button>
+      <button type="button" data-tstyle="outline" class="seg-btn">Outline title</button>
+      <button type="button" data-tstyle="glow" class="seg-btn">Neon glow title</button>
+    </div>
     <label class="slider-row">Heat meter <input id="stars" type="range" min="1" max="5" step="1" value="4"><span id="starsVal">★★★★☆</span></label>
 
-    <h2>5 · Selected panel</h2>
+    <h2>6 · Selected panel</h2>
     <div id="panelMap" class="panel-map" aria-label="Choose a panel to crop"></div>
     <label class="slider-row">Zoom <input id="zoom" type="range" min="100" max="260" value="130"><span id="zoomVal">1.30×</span></label>
     <label class="slider-row">Pan X <input id="panX" type="range" min="-50" max="50" value="0"><span id="panXVal">0</span></label>
     <label class="slider-row">Pan Y <input id="panY" type="range" min="-50" max="50" value="0"><span id="panYVal">0</span></label>
     <div class="row">
+      <button id="fitToggle" type="button" class="btn">Fit: cover</button>
       <button id="resetPanel" type="button" class="btn">Reset panel crop</button>
       <button id="resetAll" type="button" class="btn">Reset everything</button>
     </div>
 
-    <h2>6 · Export PNG</h2>
+    <h2>7 · Finish &amp; export PNG</h2>
+    <label class="check-row"><input id="frameToggle" type="checkbox"> White poster frame</label>
+    <label class="slider-row">Film grain <input id="grain" type="range" min="0" max="100" value="40"><span id="grainVal">40%</span></label>
     <div class="export-grid">
       <button type="button" class="btn btn-export" data-size="square">1080 × 1080<br><small>Square post</small></button>
       <button type="button" class="btn btn-export" data-size="portrait">1080 × 1350<br><small>Portrait post</small></button>
@@ -86,7 +111,7 @@
       </span>
     </div>
     <div class="canvas-holder"><canvas id="cover" width="1080" height="1080" aria-label="The cover art preview"></canvas></div>
-    <p class="hint center">Tip: click any panel in the mini-map, then drag the Zoom / Pan sliders to frame that shot. Everything runs offline — nothing is uploaded.</p>
+    <p class="hint center">Tip: click a photo panel right on the preview to select it, then drag the Zoom / Pan sliders to frame that shot. Everything runs offline — nothing is uploaded.</p>
   </section>
 </main>
 <footer class="foot">Neon Coast is an original fan-style cover maker. Not affiliated with Rockstar Games. No logos, artwork or fonts from any game are used.</footer>
